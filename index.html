@@ -6,13 +6,13 @@
   <title>Encodify | رمزنگار فارسی</title>
   <meta name="description" content="ابزار رمزنگاری متن به فارسی - مناسب برای SMS و شبکه‌های اجتماعی" />
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css?v2.1" />
+  <link rel="stylesheet" href="assets/css/style.css?v3.2" />
 </head>
 <body>
   <div class="wrap">
     <!-- Header -->
     <header class="head">
-      <h1>🔐 Encodify</h1>
+      <h1>🔐 Encodify <small>v3.1</small></h1>
       <p class="subtitle">
         ابزار رمزنگاری متن به فارسی — مناسب برای ارسال امن در شرایط شنود یا محدودیت پیامکی
       </p>
@@ -39,7 +39,13 @@
         <div class="option-item">
           <label for="encodingMethod">روش کدگذاری</label>
           <select id="encodingMethod">
-            <option value="persian">فارسی‌ساز (SMS) ⭐</option>
+            <option value="sms-stealth">🔒 SMS پنهان (کوتاه+مخفی) ⭐</option>
+            <option value="sms-mini">📱 SMS مینی (کوتاه‌ترین)</option>
+            <option value="sms-compact">📝 SMS فشرده (کلمات)</option>
+            <option value="homoglyph-emoji">همگلیف+ایموجی (پنهان)</option>
+            <option value="homoglyph">همگلیف (پنهان‌نگاری)</option>
+            <option value="finglish">فینگلیش (لاتین)</option>
+            <option value="persian">فارسی‌ساز</option>
             <option value="sentence">جمله‌ای (کلمات)</option>
             <option value="zwc">ZWC نامرئی (شبکه اجتماعی)</option>
           </select>
@@ -80,6 +86,12 @@
             <label for="decodeMethod">روش رمزگشایی</label>
             <select id="decodeMethod">
               <option value="auto" selected>🔍 تشخیص خودکار</option>
+              <option value="sms-stealth">🔒 SMS پنهان</option>
+              <option value="sms-mini">📱 SMS مینی</option>
+              <option value="sms-compact">📝 SMS فشرده</option>
+              <option value="homoglyph-emoji">همگلیف+ایموجی</option>
+              <option value="homoglyph">همگلیف</option>
+              <option value="finglish">فینگلیش</option>
               <option value="persian">فارسی‌ساز</option>
               <option value="sentence">جمله‌ای</option>
               <option value="zwc">ZWC نامرئی</option>
@@ -122,6 +134,6 @@
     </footer>
   </div>
 
-  <script src="script.js?v2.1"></script>
+  <script src="script.js?v3.2"></script>
 </body>
 </html>
