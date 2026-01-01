@@ -1,6 +1,168 @@
 // =====================================================
-// Encodify v2.1 - سیستم رمزنگاری فارسی
+// Encodify v2.2 - سیستم رمزنگاری فارسی
 // =====================================================
+
+// =====================================================
+// Legacy v1 - پشتیبانی از نسخه قدیمی (کلمات + ایموجی)
+// =====================================================
+
+const LEGACY_WORDS_64 = [
+  "آب", "آسمان", "آتش", "ابر", "امید", "انسان", "ایران", "باد",
+  "باران", "باغ", "برف", "بهار", "پرواز", "پنجره", "پیام", "تلاش",
+  "توسعه", "جاده", "جهان", "حقیقت", "خورشید", "دریا", "درخت", "دل",
+  "دوست", "راه", "رود", "رویا", "روز", "زمان", "زمین", "زیبا",
+  "سفر", "سلام", "سنگ", "سکوت", "شادی", "شب", "صبح", "صدا",
+  "طبیعت", "طلوع", "عشق", "علم", "فردا", "فرصت", "فصل", "فکر",
+  "قلم", "قلب", "کار", "کتاب", "کوه", "کودک", "گل", "لبخند",
+  "لحظه", "مردم", "مهر", "مهتاب", "موج", "نور", "نگاه", "هدف", "هوا", "یاد"
+];
+
+const LEGACY_WORDS_POOL = [
+  "زندگی", "آرامش", "محبت", "مهربانی", "دوستی", "امروز", "اکنون", "آینده",
+  "باور", "شوق", "انگیزه", "توان", "حرکت", "رشد", "پیشرفت", "اندیشه",
+  "خرد", "دانش", "آگاهی", "پیروزی", "تجربه", "تمرین", "توجه", "امتحان",
+  "پایداری", "یاری", "همراه", "همسفر", "رهایی", "آغاز", "پایان", "خاطره",
+  "داستان", "تصویر", "نقش", "راز", "حس", "احساس", "دیدار", "گفتگو",
+  "پرسش", "پاسخ", "آواز", "ترانه", "نغمه", "رنگ", "عطر", "خانه",
+  "خانواده", "دوام", "مسیر", "قدم", "گام", "ساحل", "افق", "سپیده",
+  "پرتو", "روشنایی", "گرما", "نسیم", "سایه", "پناه", "سپاس", "لب",
+  "چشم", "دست", "خنده", "لبخند", "یادگار", "بیداری", "بخشش", "امانت",
+  "شکوفه", "آبی", "زرین", "سپید", "سبز", "سرخ", "نقره", "بلور",
+  "چشمه", "جوی", "آبشار", "دشت", "کشتزار", "پرنده", "آهو", "ماه",
+  "ستاره", "خورشید", "صبحگاه", "شامگاه", "بارقه", "آذرخش", "رعد", "برق"
+];
+
+const LEGACY_EMOJI_POOL = [
+  "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "🙂", "😉", "😊", "😇",
+  "😍", "😘", "😗", "😙", "😚", "😋", "😛", "😜", "😝", "😎", "🤓", "🧐",
+  "🤗", "🤔", "😐", "😑", "🙄", "😬", "😌", "😔", "😪", "😴", "🥳",
+  "💛", "💚", "💙", "💜", "🧡", "🤍", "🖤", "💘", "💝", "💖", "💗", "💓",
+  "💞", "💕", "💟", "❣", "💯", "✨", "🌟", "⭐", "⚡", "🔥", "💧", "🌈",
+  "🌙", "🌍", "🌎", "🌏", "🌸", "🌼", "🌻", "🌺", "🌷", "🌹", "🥀", "🌿",
+  "🍀", "🌱", "🌳", "🌲", "🌴", "🌵", "🍁", "🍂", "🍃", "🌊", "⛰", "🏔",
+  "🏕", "🎈", "🎉", "🎊", "🎁", "🏆", "🎯", "🎵", "🎶", "📌", "📍", "🧭",
+  "⏰", "📅", "📝", "📚", "📖", "✏", "🧠", "🔑", "🔒", "🔓", "🛡", "⚙",
+  "🔧", "🔨", "🧰", "🔬", "💡", "🔦", "📷", "🎥", "📱", "💻", "🖥", "🛰",
+  "🚀", "✈", "🚗", "🚲", "🚶", "🏃", "🧘", "🤝", "👏", "🙌", "🙏",
+  "🌞", "☀", "☁", "🌧", "❄", "🌨", "⛅", "⛈", "🌦", "🌤"
+];
+
+// ساخت توکن‌های Legacy
+function isSafeWord(w) {
+  return /^[\u0600-\u06FF\u200C]+$/.test(w);
+}
+function isSafeEmoji(e) {
+  if (e.includes('\u200D')) return false;
+  if (e.includes('\uFE0F')) return false;
+  if (/\s/.test(e)) return false;
+  return true;
+}
+
+function pickUnique(list, n, predicate) {
+  const out = [];
+  const seen = new Set();
+  for (const x of list) {
+    if (predicate && !predicate(x)) continue;
+    if (seen.has(x)) continue;
+    seen.add(x);
+    out.push(x);
+    if (out.length === n) break;
+  }
+  return out;
+}
+
+const LEGACY_WORDS = (() => {
+  const merged = [...LEGACY_WORDS_64, ...LEGACY_WORDS_POOL];
+  return pickUnique(merged, 128, isSafeWord);
+})();
+
+const LEGACY_EMOJIS = (() => {
+  return pickUnique(LEGACY_EMOJI_POOL, 128, isSafeEmoji);
+})();
+
+const LEGACY_TOKENS = [...LEGACY_WORDS, ...LEGACY_EMOJIS];
+const LEGACY_TOKEN_TO_INDEX = new Map(LEGACY_TOKENS.map((t, i) => [t, i]));
+
+function legacyTokensToBytes(text) {
+  const tokens = text.trim().split(/\s+/).filter(Boolean);
+  if (!tokens.length) throw new Error("ورودی خالی است");
+
+  const out = new Uint8Array(tokens.length);
+  for (let i = 0; i < tokens.length; i++) {
+    const t = tokens[i];
+    const idx = LEGACY_TOKEN_TO_INDEX.get(t);
+    if (idx === undefined) throw new Error("توکن نامعتبر: " + t);
+    out[i] = idx;
+  }
+
+  if (out.length < 4) throw new Error("داده کافی نیست");
+  const len = ((out[0] << 24) | (out[1] << 16) | (out[2] << 8) | out[3]) >>> 0;
+  const payload = out.slice(4);
+  if (payload.length < len) throw new Error("داده ناقص/دستکاری شده");
+  return payload.slice(0, len);
+}
+
+async function unpackDataLegacy(bytes, pass) {
+  if (bytes.length < 2) throw new Error("داده خراب است");
+  const version = bytes[0];
+  const flags = bytes[1];
+  if (version !== 1) throw new Error("نسخه پشتیبانی نمی‌شود");
+
+  const encrypted = (flags & 1) === 1;
+  const compressed = (flags & 2) === 2;
+
+  let payload;
+  if (!encrypted) {
+    payload = bytes.slice(2);
+  } else {
+    if (!pass) throw new Error("کلید لازم است");
+    if (bytes.length < 31) throw new Error("داده ناقص است");
+
+    const salt = bytes.slice(2, 18);
+    const iv = bytes.slice(18, 30);
+    const cipher = bytes.slice(30);
+
+    if (!hasCrypto) throw new Error("این مرورگر از AES پشتیبانی نمی‌کند");
+
+    const baseKey = await crypto.subtle.importKey(
+      "raw", te.encode(pass), "PBKDF2", false, ["deriveKey"]
+    );
+    const key = await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt, iterations: 150000, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["decrypt"]
+    );
+
+    let plainAB;
+    try {
+      plainAB = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv },
+        key,
+        cipher
+      );
+    } catch {
+      throw new Error("کلید نادرست است یا داده دستکاری شده");
+    }
+    payload = new Uint8Array(plainAB);
+  }
+
+  const raw = compressed ? await gzipDecompress(payload) : payload;
+  return td.decode(raw);
+}
+
+function detectLegacy(text) {
+  const tokens = text.trim().split(/\s+/).filter(Boolean);
+  if (tokens.length < 4) return false;
+  
+  let matched = 0;
+  for (const t of tokens) {
+    if (LEGACY_TOKEN_TO_INDEX.has(t)) matched++;
+  }
+  
+  return matched / tokens.length > 0.8;
+}
 
 // =====================================================
 // کدگذاری فارسی‌ساز - تبدیل کاراکتر به کاراکتر
@@ -462,6 +624,11 @@ function detectEncodingMethod(text) {
     if (text.includes(zwc)) return 'zwc';
   }
   
+  // بررسی Legacy (کلمات + ایموجی)
+  if (detectLegacy(text)) {
+    return 'legacy';
+  }
+  
   // بررسی فارسی‌ساز (اگر بیشتر حروف فارسی باشند)
   const persianChars = Object.values(PERSIAN_MAP);
   let persianCount = 0;
@@ -489,6 +656,16 @@ function detectEncodingMethod(text) {
   
   if (words.length > 0 && sentenceCount / words.length > 0.3) {
     return 'sentence';
+  }
+  
+  // fallback - بررسی مجدد Legacy با threshold پایین‌تر
+  const tokens = text.trim().split(/\s+/).filter(Boolean);
+  let legacyMatched = 0;
+  for (const t of tokens) {
+    if (LEGACY_TOKEN_TO_INDEX.has(t)) legacyMatched++;
+  }
+  if (tokens.length > 0 && legacyMatched / tokens.length > 0.5) {
+    return 'legacy';
   }
   
   return 'persian';
@@ -584,7 +761,12 @@ async function decrypt() {
   try {
     let output;
     
-    if (method === 'persian') {
+    if (method === 'legacy') {
+      // نسخه قدیمی - کلمات + ایموجی
+      const bytes = legacyTokensToBytes(coded);
+      output = await unpackDataLegacy(bytes, pass);
+      
+    } else if (method === 'persian') {
       // فارسی‌ساز
       const decoded = decodePersian(coded);
       
@@ -614,7 +796,8 @@ async function decrypt() {
     $("out").value = output;
     
     let statusMsg = "انجام شد";
-    if (method === 'persian') statusMsg += " (فارسی‌ساز)";
+    if (method === 'legacy') statusMsg += " (نسخه قدیمی v1)";
+    else if (method === 'persian') statusMsg += " (فارسی‌ساز)";
     else if (method === 'zwc') statusMsg += " (ZWC)";
     else statusMsg += " (جمله‌ای)";
     
