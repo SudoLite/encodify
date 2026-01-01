@@ -1,87 +1,127 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
-  <head>
-    <meta charset="utf-8" />
-    <title>Encodify | مخدوش‌گر</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="assets/css/style.css?v1.2" />
-  </head>
-  <body>
-    <div class="wrap">
-      <header class="head">
-        <div>
-          <h1>مخدوش‌گر</h1>
-          <p class="subtitle">
-            یک ابزار تحت وب مناسب ارسال امن‌تر در شرایط شنود یا محدودیت پیامکی،
-            که متن، لینک و کانفیگ‌ها را با کلید اختیاری به کلمات فارسی و ایموجی
-            تبدیل نموده و امکان بازگردانی مجدد آن‌را فراهم می‌کند.
-          </p>
-        </div>
-        <div class="badges">
-          <span class="badge">حروف معنادار فارسی</span>
-          <span class="badge">ایموجی</span>
-          <span class="badge">فاقد عدد</span>
-          <span class="badge">فاقد کاراکترهای زائد</span>
-          <span class="badge">کلید اختیاری</span>
-        </div>
-      </header>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Encodify | رمزنگار فارسی</title>
+  <meta name="description" content="ابزار رمزنگاری متن به فارسی - مناسب برای SMS و شبکه‌های اجتماعی" />
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css?v2.1" />
+</head>
+<body>
+  <div class="wrap">
+    <!-- Header -->
+    <header class="head">
+      <h1>🔐 Encodify</h1>
+      <p class="subtitle">
+        ابزار رمزنگاری متن به فارسی — مناسب برای ارسال امن در شرایط شنود یا محدودیت پیامکی
+      </p>
+      <div class="badges">
+        <span class="badge">📱 سازگار با SMS</span>
+        <span class="badge">💬 شبکه‌های اجتماعی</span>
+        <span class="badge">🔒 رمزنگاری اختیاری</span>
+        <span class="badge">🇮🇷 خروجی فارسی</span>
+      </div>
+    </header>
 
-      <label for="plain">ورودی</label>
-      <textarea
-        id="plain"
-        placeholder="برای رمزنگاری: متن اصلی را اینجا بگذارید.
-برای رمزگشایی: متن مخدوش‌شده را همینجا بچسبانید."
+    <!-- Input Card -->
+    <div class="card">
+      <h2 class="card-title">📝 ورودی</h2>
+      
+      <textarea 
+        id="plain" 
+        placeholder="متن، لینک یا کانفیگ خود را اینجا وارد کنید...
+
+برای رمزگشایی: متن رمزشده را اینجا بچسبانید."
       ></textarea>
 
-      <label for="pass">کلید (اختیاری)</label>
-      <input id="pass" placeholder="اگر کلید دارد، اینجا وارد کنید." />
+      <div class="options-grid">
+        <div class="option-item">
+          <label for="encodingMethod">روش کدگذاری</label>
+          <select id="encodingMethod">
+            <option value="persian">فارسی‌ساز (SMS) ⭐</option>
+            <option value="sentence">جمله‌ای (کلمات)</option>
+            <option value="zwc">ZWC نامرئی (شبکه اجتماعی)</option>
+          </select>
+        </div>
+        
+        <div class="option-item">
+          <label for="encStrength">قدرت رمزنگاری</label>
+          <select id="encStrength">
+            <option value="light" selected>سبک (خروجی کوتاه)</option>
+            <option value="secure">امن (AES-256)</option>
+          </select>
+        </div>
 
-      <div class="buttons">
-        <button class="primary" id="encBtn" title="متن → کلمات">
-          🔒 رمزنگاری
-        </button>
-        <button class="warning" id="decBtn" title="کلمات → متن">
-          🔓 رمزگشایی
-        </button>
-        <button id="swapBtn" title="جابجایی ورودی/خروجی">🔁 جابجایی</button>
+        <div class="option-item full-width">
+          <label for="pass">کلید رمزنگاری (اختیاری)</label>
+          <input id="pass" type="text" placeholder="اگر می‌خواهید خروجی رمزنگاری شود، کلید وارد کنید" />
+        </div>
       </div>
 
-      <label for="out">خروجی</label>
-      <textarea
-        id="out"
-        placeholder="نتیجه اینجا نمایش داده می‌شود ..."
-      ></textarea>
-
-      <div class="below">
-        <button id="copyBtn">📋 کپی خروجی</button>
-        <button class="secondary" id="clearBtn">🧹 پاکسازی فرم</button>
+      <!-- Encoding Info -->
+      <div class="info-box warning" id="encodingInfo">
+        <span class="info-box-icon">💡</span>
+        <span id="encodingInfoText">فارسی‌ساز: بهترین گزینه برای SMS — حروف انگلیسی به فارسی تبدیل می‌شوند</span>
       </div>
 
-      <div id="msg" class="msg"></div>
+      <!-- Carrier Text for ZWC -->
+      <div class="carrier-group" id="carrierGroup">
+        <label for="carrierText">متن حامل</label>
+        <input id="carrierText" type="text" placeholder="سلام خوبی؟ چه خبر؟ امروز هوا خوبه..." />
+        <p class="carrier-hint">داده رمزشده به صورت نامرئی در این متن پنهان می‌شود</p>
+      </div>
 
-      <footer class="foot">
-        تهیه شده توسط <a href="https://ircf.space" target="_blank">IRCF</a
-        ><br />
-        تقدیم به مردم شریف ایران
-        <br />
-        <br />
-        <span dir="ltr">
-          <a
-            class="github-button"
-            href="https://github.com/ircfspace/encodify"
-            data-color-scheme="no-preference: light; light: light; dark: dark;"
-            data-icon="octicon-star"
-            data-show-count="true"
-            aria-label="Star ircfspace/encodify on GitHub"
-            >Star</a
-          >
-        </span>
-      </footer>
+      <!-- Advanced Settings -->
+      <div class="advanced-section">
+        <span class="advanced-toggle" id="advancedToggle">⚙️ تنظیمات پیشرفته رمزگشایی</span>
+        <div class="advanced-options" id="advancedOptions">
+          <div class="option-item">
+            <label for="decodeMethod">روش رمزگشایی</label>
+            <select id="decodeMethod">
+              <option value="auto" selected>🔍 تشخیص خودکار</option>
+              <option value="persian">فارسی‌ساز</option>
+              <option value="sentence">جمله‌ای</option>
+              <option value="zwc">ZWC نامرئی</option>
+              <option value="legacy">نسخه قدیمی (ایموجی)</option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <script src="script.js?v1.2"></script>
-  </body>
+
+    <!-- Action Buttons -->
+    <div class="buttons">
+      <button class="primary" id="encBtn">🔒 رمزنگاری</button>
+      <button class="danger" id="decBtn">🔓 رمزگشایی</button>
+      <button class="secondary icon-only" id="swapBtn" title="جابجایی">🔁</button>
+    </div>
+
+    <!-- Output Card -->
+    <div class="card">
+      <div class="output-header">
+        <h2 class="card-title">📤 خروجی</h2>
+        <div class="output-actions">
+          <button id="copyBtn">📋 کپی</button>
+          <button class="secondary" id="clearBtn">🧹 پاک</button>
+        </div>
+      </div>
+      <textarea id="out" placeholder="نتیجه اینجا نمایش داده می‌شود..." readonly></textarea>
+    </div>
+
+    <!-- Message -->
+    <div id="msg" class="msg"></div>
+
+    <!-- Footer -->
+    <footer class="foot">
+      توسعه‌دهنده: <a href="https://x.com/sudolite" target="_blank">@SudoLite</a>
+      <br />
+      <a href="https://github.com/SudoLite/encodify" target="_blank">GitHub</a>
+      •
+      تقدیم به مردم شریف ایران 🇮🇷
+    </footer>
+  </div>
+
+  <script src="script.js?v2.1"></script>
+</body>
 </html>
